@@ -1,0 +1,32 @@
+<html>
+
+<head>
+<title>A comic</title>
+
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+<script type="text/javascript" src="/assets/js/comix.js"></script>
+
+</head>
+
+<body ng-app="Comix">
+
+  <cx-comix>
+    <h1>The Unicorn in Me</h1>
+    
+    <cx-frame>
+      <cx-dialog delay="2s" from="grandad">I think I was a unicorn once...</cx-dialog>
+      <cx-character name="unicorn" />
+      <cx-character name="grandson" />
+    </cx-frame>
+    
+    <cx-frame>
+      <cx-character name="fish" animation="jiggle"/>
+      <cx-dialog from="none">
+    </cx-frame>
+    
+</cx-comix>
+
+</body>
+
+</html>
