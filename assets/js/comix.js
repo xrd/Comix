@@ -1,19 +1,21 @@
 (function() {
-  var mod;
+  var doSomething, loaded, mod;
 
   mod = angular.module('Comix', []);
 
+  doSomething = function() {
+    return console.log("Did it");
+  };
+
+  loaded = function() {
+    var myScroll;
+    myScroll = new IScroll('#wrapper');
+    return myScroll.on('scrollEnd', doSomething);
+  };
+
   mod.controller('ComixCtrl', [
     '$scope', function($scope) {
-      $scope.foobar = "barfoo";
-      return console.log("Doing something now");
-    }
-  ]);
-
-  mod.controller('cxCtrl', [
-    '$scope', function($scope) {
-      console.log("Startig cxCtrl " + $scope.name);
-      return $scope.name = "";
+      return loaded();
     }
   ]);
 
@@ -29,7 +31,7 @@
     return {
       restrict: 'E',
       transclude: true,
-      template: '<div ng-transclude="true" ng-controller="cxCtrl" class="col-md-4" style="border: 1px dotted grey"></div>'
+      template: '<div ng-transclude="true" class="col-md-3" style="border: 1px dotted grey"></div>'
     };
   });
 
@@ -37,9 +39,10 @@
     return {
       restrict: 'E',
       scope: {
-        name: '@'
+        name: '@',
+        animation: '@'
       },
-      template: "<img src='/assets/images//{{ name }}.png'/>"
+      template: "<img src=\"/assets/images//{{ name }}.png\" ng-class=\"{ 'animated': animation, '{{animation}}': animation }\"/>"
     };
   });
 
@@ -47,9 +50,10 @@
     return {
       restrict: 'E',
       scope: {
-        delay: '@'
+        delay: '@',
+        animation: '@'
       },
-      template: '<div style="border: 2px solid black;" ng-transclude="true"></div>',
+      template: "<div style=\"border: 1px solid black; width: 60%;\" ng-transclude=\"true\" ng-class=\"{ 'animated': animation, '{{animation}}': animation }\" ></div>",
       transclude: true
     };
   });

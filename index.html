@@ -1,32 +1,60 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
-<head>
-<title>A comic</title>
+  <head>
 
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-<script type="text/javascript" src="/assets/js/comix.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-</head>
-
-<body ng-app="Comix">
-
-  <cx-comix>
-    <h1>The Unicorn in Me</h1>
+    <title>A comic</title>
     
-    <cx-frame>
-      <cx-dialog delay="2s" from="grandad">I think I was a unicorn once...</cx-dialog>
-      <cx-character name="unicorn" />
-      <cx-character name="grandson" />
-    </cx-frame>
-    
-    <cx-frame>
-      <cx-character name="fish" animation="jiggle"/>
-      <cx-dialog from="none">
-    </cx-frame>
-    
-</cx-comix>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/animate.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+    <script type="text/javascript" src="/assets/js/comix.js"></script>
+    <script type="text/javascript" src="/assets/js/iscroll.js"></script>
+    <script>
+    </script>
 
-</body>
+  </head>
+  
+  <body ng-app="Comix">
 
+    <div id="skrollr-body"></div>
+    
+
+    <cx-comix>
+      <h1>The Unicorn in Me</h1>
+
+      <div id="wrapper">
+      
+      <cx-frame>
+        <cx-dialog animation="zoomInDown" delay="2s" from="grandad">I think I was a unicorn once...</cx-dialog>
+        <cx-character name="grandad" animation="pulse" />
+        <cx-character name="grandson" animation="wobble" />
+      </cx-frame>
+      
+      <cx-frame>
+        <cx-character name="fish" animation="wobble"/>
+        <cx-dialog from="none">
+      </cx-frame>
+
+
+      <cx-frame>
+        <cx-character name="fish" animation="wobble"/>
+        <cx-dialog from="none">
+      </cx-frame>
+
+      <cx-frame>
+        <cx-character name="fish" animation="wobble"/>
+        <cx-dialog from="none">
+      </cx-frame>
+
+    </div>
+      
+    </cx-comix>
+    
+  </body>
+  
 </html>

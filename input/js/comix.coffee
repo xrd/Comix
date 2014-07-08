@@ -1,16 +1,16 @@
 mod = angular.module 'Comix', []
 
+doSomething = () ->
+        console.log( "Did it" );
+              
+loaded = () ->
+        myScroll = new IScroll('#wrapper');
+        myScroll.on('scrollEnd', doSomething);
+
 mod.controller 'ComixCtrl', [ '$scope', ($scope) ->
 
-        $scope.foobar = "barfoo"
-
-        console.log "Doing something now"
-
-        ]
-
-mod.controller 'cxCtrl', [ '$scope', ($scope) ->
-        console.log "Startig cxCtrl #{$scope.name}"
-        $scope.name = ""
+        loaded()
+                
         ]
 
 mod.directive 'cxComix', () ->
@@ -24,20 +24,24 @@ mod.directive 'cxFrame', () ->
         return {
                 restrict: 'E'
                 transclude: true,
-                template: '<div ng-transclude="true" ng-controller="cxCtrl" class="col-md-4" style="border: 1px dotted grey"></div>'
+                template: '<div ng-transclude="true" class="col-md-3" style="border: 1px dotted grey"></div>'
                 }
 
 mod.directive 'cxCharacter', () ->
         return {
                 restrict: 'E',
-                scope: { name: '@' },
-                template: "<img src='/assets/images//{{ name }}.png'/>"
+                scope: { name: '@', animation: '@' },
+                template: """
+                        <img src="/assets/images//{{ name }}.png" ng-class="{ 'animated': animation, '{{animation}}': animation }"/>
+                        """
                 }
-
+                
 mod.directive 'cxDialog', () ->
         return {
                 restrict: 'E',
-                scope: { delay: '@' },
-                template: '<div style="border: 2px solid black;" ng-transclude="true"></div>',
+                scope: { delay: '@', animation: '@' },
+                template: """
+                        <div style="border: 1px solid black; width: 60%;" ng-transclude="true" ng-class="{ 'animated': animation, '{{animation}}': animation }" ></div>
+                        """
                 transclude: true
                 }
