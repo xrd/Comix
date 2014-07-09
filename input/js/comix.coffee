@@ -5,18 +5,21 @@ doSomething = () ->
               
 loaded = () ->
         myScroll = new IScroll('#wrapper');
+        console.log "Got something here"
         myScroll.on('scrollEnd', doSomething);
 
 mod.controller 'ComixCtrl', [ '$scope', ($scope) ->
-
         loaded()
-                
         ]
 
 mod.directive 'cxComix', () ->
         return  {
                 restrict: 'E',
                 transclude: true
+                link: (scope,elem,attr) ->
+                        loaded()
+                        
+                scope: { minHeight: '@' }
                 template: '<div class="container" ng-transclude></div>'
                 }
 
@@ -24,15 +27,18 @@ mod.directive 'cxFrame', () ->
         return {
                 restrict: 'E'
                 transclude: true,
-                template: '<div ng-transclude="true" class="col-md-3" style="border: 1px dotted grey"></div>'
+                # scope: { minHeight: '@' }
+                template: '<div ng-transclude="true" class="col-md-3" style="border: 1px dotted grey; min-height: {{ minHeight }}"></div>'
                 }
 
 mod.directive 'cxCharacter', () ->
         return {
                 restrict: 'E',
-                scope: { name: '@', animation: '@' },
+                scope: { name: '@', animation: '@', width: '@' },
                 template: """
-                        <img src="/assets/images//{{ name }}.png" ng-class="{ 'animated': animation, '{{animation}}': animation }"/>
+                        <img src="/assets/images//{{ name }}.png"
+                        style="width: {{ width }}px; height: auto;"
+                        ng-class="{ 'animated': animation, '{{animation}}': animation }"/>
                         """
                 }
                 

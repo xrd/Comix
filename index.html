@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>A comic</title>
+    <title>The unicorn in me</title>
     
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/animate.css">
@@ -21,10 +21,7 @@
   
   <body ng-app="Comix">
 
-    <div id="skrollr-body"></div>
-    
-
-    <cx-comix>
+    <cx-comix minHeight="400px">
       <h1>The Unicorn in Me</h1>
 
       <div id="wrapper">
@@ -37,18 +34,14 @@
       
       <cx-frame>
         <cx-character name="fish" animation="wobble"/>
-        <cx-dialog from="none">
       </cx-frame>
 
-
       <cx-frame>
-        <cx-character name="fish" animation="wobble"/>
-        <cx-dialog from="none">
+        <cx-character name="fish" width="60"/>
       </cx-frame>
 
       <cx-frame>
         <cx-character name="fish" animation="wobble"/>
-        <cx-dialog from="none">
       </cx-frame>
 
     </div>

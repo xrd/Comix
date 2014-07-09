@@ -10,6 +10,7 @@
   loaded = function() {
     var myScroll;
     myScroll = new IScroll('#wrapper');
+    console.log("Got something here");
     return myScroll.on('scrollEnd', doSomething);
   };
 
@@ -23,6 +24,12 @@
     return {
       restrict: 'E',
       transclude: true,
+      link: function(scope, elem, attr) {
+        return loaded();
+      },
+      scope: {
+        minHeight: '@'
+      },
       template: '<div class="container" ng-transclude></div>'
     };
   });
@@ -31,7 +38,7 @@
     return {
       restrict: 'E',
       transclude: true,
-      template: '<div ng-transclude="true" class="col-md-3" style="border: 1px dotted grey"></div>'
+      template: '<div ng-transclude="true" class="col-md-3" style="border: 1px dotted grey; min-height: {{ minHeight }}"></div>'
     };
   });
 
@@ -40,9 +47,10 @@
       restrict: 'E',
       scope: {
         name: '@',
-        animation: '@'
+        animation: '@',
+        width: '@'
       },
-      template: "<img src=\"/assets/images//{{ name }}.png\" ng-class=\"{ 'animated': animation, '{{animation}}': animation }\"/>"
+      template: "<img src=\"/assets/images//{{ name }}.png\"\nstyle=\"width: {{ width }}px; height: auto;\"\nng-class=\"{ 'animated': animation, '{{animation}}': animation }\"/>"
     };
   });
 
