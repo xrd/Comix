@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="/assets/css/animate.css">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
     <script type="text/javascript" src="/assets/js/comix.js"></script>
-    <script type="text/javascript" src="/assets/js/iscroll.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.lettering-0.6.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.scrollorama.js"></script>
     <script>
     </script>
 
@@ -21,10 +23,7 @@
   
   <body ng-app="Comix">
 
-    <cx-comix minHeight="400px">
-      <h1>The Unicorn in Me</h1>
-
-      <div id="wrapper">
+    <cx-comix minHeight="400px" controls="true" title="The Unicorn in Me">
       
       <cx-frame>
         <cx-dialog animation="zoomInDown" delay="2s" from="grandad">I think I was a unicorn once...</cx-dialog>
@@ -33,7 +32,7 @@
       </cx-frame>
       
       <cx-frame>
-        <cx-character name="fish" animation="wobble"/>
+        <cx-character name="fish" animation="wobble" top="40" left="100"/>
       </cx-frame>
 
       <cx-frame>
@@ -44,8 +43,6 @@
         <cx-character name="fish" animation="wobble"/>
       </cx-frame>
 
-    </div>
-      
     </cx-comix>
     
   </body>
