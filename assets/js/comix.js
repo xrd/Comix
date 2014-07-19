@@ -1,5 +1,5 @@
 (function() {
-  var cache_animation, doSomething, index, init, mod, scrollorama, setupScroll;
+  var cache_animation, doSomething, init, mod, scrollorama, setupScroll;
 
   mod = angular.module('Comix', []);
 
@@ -10,45 +10,45 @@
   scrollorama = void 0;
 
   setupScroll = function(scope) {
-    scrollorama = $.scrollorama({
-      blocks: '.scrollblock'
-    });
-    return scrollorama.onBlockChange(function() {
-      return scope.$root.$broadcast('scrollblock', scrollorama.blockIndex);
+    return $('.scrollblock').on('inview', function(event, elem) {
+      var parent, parentId;
+      parent = event.target.classList[event.target.classList.length - 1];
+      parentId = parent.substr("frame".length);
+      return scope.$root.$broadcast('scrollblock', parentId);
     });
   };
 
   cache_animation = function(scope) {
     scope.cached_animation = scope.animation;
-    scope.animation = void 0;
-    return console.log("Clearing animation: " + scope.animation + " / " + scope.cached_animation);
+    return scope.animation = void 0;
   };
 
-  init = function(parentId, scope, el, ctx) {
+  init = function(frame, scope, el, ctx) {
     cache_animation(scope);
     return scope.$on('associate', function(event, ref) {
-      return scope.$on("animate-" + ctx, function(event, anRef) {
-        if (ref === anRef) {
-          console.log("Animating for " + ref + " / " + scope.animation + " / " + scope.cached_animation);
-          el.addClass('animated');
-          el.addClass(scope.cached_animation);
-          return scope.animation = scope.cached_animation;
-        }
-      });
+      if (frame.parentId === ref) {
+        console.log("Setting parentId: " + frame.parentId + " / " + ref + " / " + ctx);
+        scope.frameParent = frame.parentId;
+        return scope.$on("animate-" + ctx, function(event, anRef) {
+          if (ref === anRef) {
+            return scope.animation = scope.cached_animation;
+          }
+        });
+      }
     });
   };
 
-  mod.directive('cxComix', function() {
+  mod.directive('cxComix', function($timeout) {
     var controlsTemplate, offset, template, wantControls;
     wantControls = false;
-    offset = "20px";
-    controlsTemplate = "<div class=\"controls\" ng-show=\"controls\">\n<div style=\"position: fixed; top: " + offset + "; left: " + offset + "\"><span class=\"glyphicon glyphicon-home\"/></div>\n<div style=\"position: fixed; bottom: " + offset + "; left: " + offset + "\"><span class=\"glyphicon glyphicon-envelope\"/></div>\n<div style=\"position: fixed; bottom: " + offset + "; right: " + offset + "\"><span ng-click=\"down()\" class=\"glyphicon glyphicon-arrow-down\"/></div>\n<div style=\"position: fixed; top: " + offset + "; right: " + offset + "\"><span ng-click=\"up()\" class=\"glyphicon glyphicon-arrow-up\"/></div>\n</div>";
+    offset = "20";
+    controlsTemplate = "<div style=\"position: fixed; bottom: " + offset + "px; width: 100%; z-index: 1000;\">\n        <div class=\"controls\" ng-show=\"controls\" class=\"text-center\" style=\"width: 100%\">\n                <span ng-click=\"goUp()\" class=\"glyphicon glyphicon-arrow-up\"></span>\n                <span ng-click=\"goDown()\" class=\"glyphicon glyphicon-arrow-down\"></span>\n                <span class=\"glyphicon glyphicon-home\"></span>\n                <span class=\"glyphicon glyphicon-share\"></span>\n        </div>\n</div>";
     template = function() {
       var rv;
       rv = "";
       rv += controlsTemplate;
       rv += '<div class="text-center"><h1>{{title}}</h1></div>';
-      rv += "<div class=\"container\" ng-transclude></div>";
+      rv += "<div class=\"container\" ng-transclude=\"true\"></div>";
       return rv;
     };
     return {
@@ -56,13 +56,13 @@
       transclude: true,
       controller: [
         '$scope', function(scope) {
-          scope.up = function() {
+          scope.goUp = function() {
             console.log("Got up!");
             return scope.$root.$broadcast('up');
           };
-          return scope.down = function() {
-            scope.$root.$broadcast('down');
-            return console.log("Got down!");
+          return scope.goDown = function() {
+            console.log("Got down!");
+            return scope.$root.$broadcast('down');
           };
         }
       ],
@@ -73,7 +73,6 @@
         return setupScroll(scope);
       },
       scope: {
-        minHeight: '@',
         controls: '@',
         title: '@'
       },
@@ -81,43 +80,50 @@
     };
   });
 
-  index = 0;
-
-  mod.directive('cxFrame', function($timeout) {
-    var parentIndex;
+  mod.directive('cxFrame', function() {
+    var getTemplate, parentIndex;
     parentIndex = 0;
+    getTemplate = function() {
+      return "ID: {{frameParent}}\n<div class=\"col-md-3\" style=\"border: 1px dotted grey; height: 400px;\">\n<div ng-transclude=\"true\" class=\"scrollblock frame{{frameParent}}\"></div>\n</div>";
+    };
     return {
       restrict: 'E',
-      controller: function() {
-        return this.frameParent = parentIndex++;
-      },
       transclude: true,
+      controller: function() {
+        this.parentId = parentIndex;
+        return parentIndex++;
+      },
       link: function(scope, el, attr, controller) {
-        scope.$root.$broadcast('associate', controller.frameParent);
-        return scope.$on('scrollblock', function(event, args) {
-          scope.$root.$broadcast('animate-characters', args);
-          return scope.$root.$broadcast('animate-dialogs', args);
+        console.log("Controller: " + controller.parentId);
+        scope.$broadcast('associate', controller.parentId);
+        return scope.$on('scrollblock', function(event, parentId) {
+          console.log("Got scrollblock rebroadcast " + event.target + "/ " + parentId);
+          if (parentIndex === parentId) {
+            console.log("Receiving scrollblock and re-dispatching for " + parentId);
+            scope.$root.$broadcast('animate-characters', parentId);
+            return scope.$root.$broadcast('animate-dialogs', parentId);
+          }
         });
       },
-      template: "<div ng-transclude=\"true\" class=\"col-md-3 scrollblock\" style=\"min-height: 400px; border: 1px dotted grey; min2-height: {{ minHeight }}\"></div>"
+      template: getTemplate()
     };
   });
 
   mod.directive('cxCharacter', function() {
     return {
       restrict: 'E',
+      require: '^cxFrame',
       scope: {
         name: '@',
-        animation: '@',
+        'animation': '@',
         width: '@',
         top: '@',
         left: '@'
       },
-      require: '^cxFrame',
       link: function(scope, el, attr, frame) {
-        return init(frame.parent, scope, el, 'characters');
+        return init(frame, scope, el, 'characters');
       },
-      template: "<img src=\"/assets/images//{{ name }}.png\"\nstyle=\"width: {{ width }}px; height: auto; position: absolute; top: {{top}}px; left: {{left}}px;\"\nng-class2=\"{ 'animated': animation, '{{animation}}': animation }\"/>"
+      template: "<img src=\"/assets/images//{{ name }}.png\"\nstyle=\"width: {{ width }}px; height: auto; position: absolute; top: {{top}}px; left: {{left}}px;\"\nng-class=\"{ 'animated': animation, '{{animation}}': animation }\"/>"
     };
   });
 
@@ -126,13 +132,13 @@
       restrict: 'E',
       require: '^cxFrame',
       link: function(scope, el, attr, frame) {
-        return init(frame.parent, scope, el, 'dialogs');
+        return init(frame, scope, el, 'dialogs');
       },
       scope: {
         delay: '@',
         animation: '@'
       },
-      template: "<div style=\"border: 1px solid black; width: 60%;\" ng-transclude=\"true\" ng-class2=\"{ 'animated': animation, '{{animation}}': animation }\" ></div>",
+      template: "<p ng-transclude=\"true\" class=\"bubble speech\" ng-class=\"{ 'animated': animation, '{{animation}}': animation }\" ></p>",
       transclude: true
     };
   });

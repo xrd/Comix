@@ -11,40 +11,26 @@
     
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/animate.css">
+    <link rel="stylesheet" href="/assets/css/speech.css">
+
+    <!-- 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-    <script type="text/javascript" src="/assets/js/comix.js"></script>
+    -->
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/react/0.10.0/JSXTransformer.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/react/0.10.0/react-with-addons.js"></script>
+
+    <script type="text/jsx" src="/assets/js/comix-react.js"></script>
     <script type="text/javascript" src="/assets/js/jquery-1.9.1.min.js"></script>
-    <script type="text/javascript" src="/assets/js/jquery.lettering-0.6.1.min.js"></script>
-    <script type="text/javascript" src="/assets/js/jquery.scrollorama.js"></script>
-    <script>
-    </script>
+    <script type="text/javascript" src="/assets/js/jquery.inview.js"></script>
 
   </head>
   
   <body ng-app="Comix">
-
-    <cx-comix minHeight="400px" controls="true" title="The Unicorn in Me">
-      
-      <cx-frame>
-        <cx-dialog animation="zoomInDown" delay="2s" from="grandad">I think I was a unicorn once...</cx-dialog>
-        <cx-character name="grandad" animation="pulse" />
-        <cx-character name="grandson" animation="wobble" />
-      </cx-frame>
-      
-      <cx-frame>
-        <cx-character name="fish" animation="wobble" top="40" left="100"/>
-      </cx-frame>
-
-      <cx-frame>
-        <cx-character name="fish" width="60"/>
-      </cx-frame>
-
-      <cx-frame>
-        <cx-character name="fish" animation="wobble"/>
-      </cx-frame>
-
-    </cx-comix>
     
+    <div id="example">
+    </div>
+
   </body>
   
 </html>

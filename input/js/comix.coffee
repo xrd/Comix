@@ -5,38 +5,37 @@ doSomething = () ->
 
 scrollorama = undefined
                               
-setupScroll = (scope) ->
-        scrollorama = $.scrollorama blocks:'.scrollblock'
-        scrollorama.onBlockChange () ->
-                scope.$root.$broadcast( 'scrollblock', scrollorama.blockIndex )
+setupScroll = ( scope ) -> 
+        $( '.scrollblock' ).on 'inview', (event,elem) ->
+                parent = event.target.classList[event.target.classList.length-1]
+                parentId = parent.substr("frame".length)
+                scope.$root.$broadcast( 'scrollblock', parentId )
 
 cache_animation = (scope) ->
         scope.cached_animation = scope.animation
         scope.animation = undefined
-        console.log "Clearing animation: #{scope.animation} / #{scope.cached_animation}"
 
-init = ( parentId, scope, el, ctx ) ->
+init = ( frame, scope, el, ctx ) ->
         cache_animation( scope )
         scope.$on 'associate', (event, ref) ->
-                # console.log "Registration of #{ref} for #{ctx}"
-                scope.$on "animate-#{ctx}", (event,anRef) ->
-                        if ref == anRef
-                                console.log "Animating for #{ref} / #{scope.animation} / #{scope.cached_animation}"
-                                el.addClass( 'animated' )
-                                el.addClass( scope.cached_animation )
-                                scope.animation = scope.cached_animation
-                                
+                if frame.parentId == ref
+                        console.log "Setting parentId: #{frame.parentId} / #{ref} / #{ctx}"
+                        scope.frameParent = frame.parentId
+                        scope.$on "animate-#{ctx}", ( event, anRef ) ->
+                                if ref == anRef
+                                        scope.animation = scope.cached_animation
 
-mod.directive 'cxComix', () ->
+mod.directive 'cxComix', ($timeout) ->
         wantControls = false
-
-        offset = "20px"
+        offset = "20"
         controlsTemplate = """
-                <div class="controls" ng-show="controls">
-                <div style="position: fixed; top: #{offset}; left: #{offset}"><span class="glyphicon glyphicon-home"/></div>
-                <div style="position: fixed; bottom: #{offset}; left: #{offset}"><span class="glyphicon glyphicon-envelope"/></div>
-                <div style="position: fixed; bottom: #{offset}; right: #{offset}"><span ng-click="down()" class="glyphicon glyphicon-arrow-down"/></div>
-                <div style="position: fixed; top: #{offset}; right: #{offset}"><span ng-click="up()" class="glyphicon glyphicon-arrow-up"/></div>
+                <div style="position: fixed; bottom: #{offset}px; width: 100%; z-index: 1000;">
+                        <div class="controls" ng-show="controls" class="text-center" style="width: 100%">
+                                <span ng-click="goUp()" class="glyphicon glyphicon-arrow-up"></span>
+                                <span ng-click="goDown()" class="glyphicon glyphicon-arrow-down"></span>
+                                <span class="glyphicon glyphicon-home"></span>
+                                <span class="glyphicon glyphicon-share"></span>
+                        </div>
                 </div>
         """
 
@@ -45,7 +44,7 @@ mod.directive 'cxComix', () ->
                 rv += controlsTemplate
                 rv += '<div class="text-center"><h1>{{title}}</h1></div>'
                 rv += """
-                <div class="container" ng-transclude></div>
+                <div class="container" ng-transclude="true"></div>
                 """
                 rv
 
@@ -53,52 +52,60 @@ mod.directive 'cxComix', () ->
                 restrict: 'E',
                 transclude: true
                 controller: [ '$scope', (scope) ->
-                        scope.up = () ->
+                        scope.goUp = () ->
                                 console.log "Got up!"
                                 scope.$root.$broadcast 'up'
-                        scope.down = () ->
-                                scope.$root.$broadcast 'down'
+                        scope.goDown = () ->
                                 console.log "Got down!"
+                                scope.$root.$broadcast 'down'
                                 ]
                 link: (scope,elem,attr) ->
                         wantControls = true if scope.controls
                         setupScroll( scope )
-                scope: { minHeight: '@', controls: '@', title: '@' }
+                scope: { controls: '@', title: '@' }
                 template: template()
                 }
 
-index = 0
-
-mod.directive 'cxFrame', ( $timeout ) ->
+mod.directive 'cxFrame', () ->
+                
         parentIndex = 0
+        getTemplate = () ->
+                """
+                ID: {{frameParent}}
+                <div class="col-md-3" style="border: 1px dotted grey; height: 400px;">
+                <div ng-transclude="true" class="scrollblock frame{{frameParent}}"></div>
+                </div>
+                """
+
         return {
                 restrict: 'E'
-                controller: () ->
-                        this.frameParent = parentIndex++
                 transclude: true,
-                link: (scope,el,attr,controller) ->
-                        # Register the parent ID into the child 
-                        scope.$root.$broadcast 'associate', controller.frameParent
-                        scope.$on 'scrollblock', (event,args) ->
-                                # console.log "Receiving scrollblock and re-dispatching for #{args}"
-                                scope.$root.$broadcast( 'animate-characters', args )
-                                scope.$root.$broadcast( 'animate-dialogs', args )
-                template: """
-                <div ng-transclude="true" class="col-md-3 scrollblock" style="min-height: 400px; border: 1px dotted grey; min2-height: {{ minHeight }}"></div>
-                """
+                controller: () ->
+                        this.parentId = parentIndex
+                        parentIndex++
+                link: ( scope, el, attr, controller ) ->
+                        console.log "Controller: #{controller.parentId}"
+                        scope.$broadcast 'associate', controller.parentId
+                        scope.$on 'scrollblock', ( event, parentId ) ->
+                                console.log "Got scrollblock rebroadcast #{event.target}/ #{parentId}"
+                                if parentIndex == parentId
+                                        console.log "Receiving scrollblock and re-dispatching for #{parentId}"
+                                        scope.$root.$broadcast( 'animate-characters', parentId )
+                                        scope.$root.$broadcast( 'animate-dialogs', parentId )
+                template: getTemplate()
                 }
 
 mod.directive 'cxCharacter', () ->
         return {
                 restrict: 'E',
-                scope: { name: '@', animation: '@', width: '@', top: '@', left: '@' },
                 require: '^cxFrame'
+                scope: { name: '@', 'animation': '@', width: '@', top: '@', left: '@' },
                 link: (scope, el, attr, frame ) ->
-                        init( frame.parent, scope, el, 'characters' )
+                        init( frame, scope, el, 'characters' )
                 template: """
                         <img src="/assets/images//{{ name }}.png"
                         style="width: {{ width }}px; height: auto; position: absolute; top: {{top}}px; left: {{left}}px;"
-                        ng-class2="{ 'animated': animation, '{{animation}}': animation }"/>
+                        ng-class="{ 'animated': animation, '{{animation}}': animation }"/>
                         """
                 }
                 
@@ -107,10 +114,10 @@ mod.directive 'cxDialog', () ->
                 restrict: 'E',
                 require: '^cxFrame'
                 link: ( scope, el, attr, frame ) ->
-                        init( frame.parent, scope, el, 'dialogs' )
+                        init( frame, scope, el, 'dialogs' )
                 scope: { delay: '@', animation: '@' },
                 template: """
-                        <div style="border: 1px solid black; width: 60%;" ng-transclude="true" ng-class2="{ 'animated': animation, '{{animation}}': animation }" ></div>
+                        <p ng-transclude="true" class="bubble speech" ng-class="{ 'animated': animation, '{{animation}}': animation }" ></p>
                         """
                 transclude: true
                 }
