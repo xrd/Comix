@@ -71,7 +71,6 @@ mod.directive 'cxFrame', () ->
         parentIndex = 0
         getTemplate = () ->
                 """
-                ID: {{frameParent}}
                 <div class="col-md-3" style="border: 1px dotted grey; height: 400px;">
                 <div ng-transclude="true" class="scrollblock frame{{frameParent}}"></div>
                 </div>

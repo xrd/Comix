@@ -84,7 +84,7 @@
     var getTemplate, parentIndex;
     parentIndex = 0;
     getTemplate = function() {
-      return "ID: {{frameParent}}\n<div class=\"col-md-3\" style=\"border: 1px dotted grey; height: 400px;\">\n<div ng-transclude=\"true\" class=\"scrollblock frame{{frameParent}}\"></div>\n</div>";
+      return "<div class=\"col-md-3\" style=\"border: 1px dotted grey; height: 400px;\">\n<div ng-transclude=\"true\" class=\"scrollblock frame{{frameParent}}\"></div>\n</div>";
     };
     return {
       restrict: 'E',
