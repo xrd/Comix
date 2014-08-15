@@ -1,31 +1,34 @@
 /** @jsx React.DOM */
 
+var CxFrame = React.createClass({
+
+  render: function() {
+
+      var createFrame = function( text ) {
+          return (
+                  <div class="scrollblock"> { text } </div>
+          );
+      }
+      
+      return (
+              <div class="col-md-3" style="border: 1px dotted grey; height: 400px;">
+              { this.props.items.map(createFrame) }
+              </div>
+      );
+  }
+});
+
+
 var CxComix = React.createClass({
+    getInitialState: function() {
+        return {items: [], text: ''};
+    },
+    
     render: function() {
         return (
                 <div class='text-center'><h1> { this.props.title } </h1></div>
+                <CxFrame items={this.state.items} />
         );
-    }
-});
-
-var CxControls = React.createClass({
-    goUp: function() {
-        
-    },
-    goDown: function() {
-
-    },
-    render: function() {
-        return (
-                <div>
-                <div style='position: fixed; width: 100%; z-index: 1000;'>                                               
-                <div class='controls' ng-show='controls' class='text-center' style='width: 100%'>
-                <span onclick='goUp()' class='glyphicon glyphicon-arrow-up'></span>
-                <span onclick='goDown()' class='glyphicon glyphicon-arrow-down'></span>
-                <span class='glyphicon glyphicon-home'></span>
-                </div>
-                </div>
-        );    
     }
 });
 
@@ -37,15 +40,6 @@ var CxCharacter = React.createClass( {
     }
 });
 
-var CxFrame = React.createClass({
-  render: function() {
-    return (
-            <div class="col-md-3" style="border: 1px dotted grey; height: 400px;">
-            <div class="scrollblock">Something</div>
-            </div>
-    );
-  }
-});
 
 var CxDialog = React.createClass({
   render: function() {
